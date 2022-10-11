@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Labs</string>
+    <string name="app_name">Sati, Abdul-Rahman - Labs</string>
+    <string name="hello_string">Hello Android!</string>
+    <string name="coinTossResult1">Heads!</string>
+    <string name="coinTossResult2">Tails!</string>
+
 </resources>

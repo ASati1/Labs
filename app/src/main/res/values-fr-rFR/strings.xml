@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sati, Abdul-Rahman - Labs</string>
+    <string name="hello_string">Bonjour Android!</string>
+    <string name="coinTossResult1">Face!</string>
+    <string name="coinTossResult2">Pile!</string>
+</resources>
