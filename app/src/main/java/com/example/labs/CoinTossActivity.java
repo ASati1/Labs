@@ -4,14 +4,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.Random;
 
 public class CoinTossActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_coin_toss_xml);
+        setContentView(R.layout.activity_coin_toss);
         Log.i(  "Activity Lifecycle", "onCreate");
+
+        Bundle extras=getIntent().getExtras();
+        String name = extras.getString("Name+");
+        Toast.makeText(getApplicationContext(),"This is the extra string that we passed in: "+name,
+                Toast.LENGTH_LONG).show();
+
     }
 
     @Override
@@ -24,13 +32,13 @@ public class CoinTossActivity extends AppCompatActivity {
 
         coinTossView.setText(result);
     }
-
     @Override
     protected void onPause() {
         super.onPause();
         Log.i( "Activity Lifecycle", "onCreate");
     }
     private String getCoinToss(){
+        Random random = new Random();
         if (random.nextBoolean()){
             return getString(R.string.coinTossResult1);
         }

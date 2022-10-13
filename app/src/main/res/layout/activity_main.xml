@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -18,14 +18,17 @@
         <Button
             android:id="@+id/coinTossButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="250dp"
             android:onClick="openCoinToss"
-            android:text="string/coinTossButtonText" />
+            android:text="@string/coinTossButtonText"
+            tools:text="@string/coinTossButtonText" />
 
         <Button
             android:id="@+id/implicitButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:onClick="openUrl"
+            android:text="@string/coinTossURLButtonText" />
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

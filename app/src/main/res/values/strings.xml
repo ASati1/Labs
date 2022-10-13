@@ -3,5 +3,6 @@
     <string name="hello_string">Hello Android!</string>
     <string name="coinTossResult1">Heads!</string>
     <string name="coinTossResult2">Tails!</string>
-
+    <string name="coinTossButtonText">OPEN COIN TOSS</string>
+    <string name="coinTossURLButtonText">OPEN URL</string>
 </resources>

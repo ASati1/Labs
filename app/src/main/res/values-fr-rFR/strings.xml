@@ -4,4 +4,6 @@
     <string name="hello_string">Bonjour Android!</string>
     <string name="coinTossResult1">Face!</string>
     <string name="coinTossResult2">Pile!</string>
+    <string name="coinTossButtonText">MONNAIE OUVERTE</string>
+    <string name="coinTossURLButtonText">URL OUVERTE</string>
 </resources>
