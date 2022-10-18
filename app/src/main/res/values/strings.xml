@@ -5,4 +5,6 @@
     <string name="coinTossResult2">Tails!</string>
     <string name="coinTossButtonText">OPEN COIN TOSS</string>
     <string name="coinTossURLButtonText">OPEN URL</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="openListButtonText">OPEN LIST</string>
 </resources>

@@ -1,6 +1,8 @@
 package com.example.labs;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -43,5 +45,14 @@ public class CoinTossActivity extends AppCompatActivity {
             return getString(R.string.coinTossResult1);
         }
         return getString(R.string.coinTossResult2);
+    }
+    @Override
+    public void finish(){
+        Intent data = new Intent();
+        TextView coinTossView=(TextView) findViewById(R.id.coinTossView);
+        String responseString=coinTossView.getText().toString();
+        data.putExtra("ResponseString",responseString);
+        setResult(RESULT_OK,data);
+        super.finish();
     }
 }
