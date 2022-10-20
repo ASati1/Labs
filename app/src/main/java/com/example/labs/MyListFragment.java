@@ -80,4 +80,10 @@ public class MyListFragment extends ListFragment {
 
         }
     }
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("curChoice", mCurCheckPosition);
+    }
 }
