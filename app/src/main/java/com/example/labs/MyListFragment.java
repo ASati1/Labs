@@ -10,7 +10,7 @@ import android.widget.ListView;
 import androidx.fragment.app.ListFragment;
 
 public class MyListFragment extends ListFragment {
-    int mCurCheckPosition=0;
+    int mCurCheckPosition = 0;
     boolean msSingleActivity;
 
     @Override
@@ -37,22 +37,47 @@ public class MyListFragment extends ListFragment {
             getListView().setItemChecked(mCurCheckPosition, true);
         }
     }
+
     @Override
-    public void onListItemClick(ListView l,View v,int position,long id){
+    public void onListItemClick(ListView l, View v, int position, long id) {
         showContext(position);
     }
 
     private void showContext(int index) {
-//        Create an intent for starting the DetailsActvity
-        Intent intent = new Intent();
+        mCurCheckPosition = index;
+
+        if (msSingleActivity) {
+            getListView().setItemChecked(index, true);
+
+//            Check what fragment is currently shown, replace if needed.
+            ListItemFragment content = (ListItemFragment) getFragmentManager()
+                    .findFragmentById(R.id.content);
+            if (content == null || content.getShownIndex() != index) {
+//                Make new fragment to show this selection.
+
+                content = ListItemFragment.newInstance(index);
+
+//                Execute a transaction, replacing any existing fragment.
+//                with this one inside the frame.
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.content, content);
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                ft.commit();
+            }
+        } else {
+//            Create an intent for starting the DetailsActivity
+
+            Intent intent = new Intent();
 
 //        explicitly set the activity context and class
 //        associate with the intent (context, class)
-        intent.setClass(getActivity(),ItemActivity.class);
+            intent.setClass(getActivity(), ItemActivity.class);
 
 //        pass the current position
-        intent.putExtra("index",index);
+            intent.putExtra("index", index);
 
-        startActivity(intent);
+            startActivity(intent);
+
+        }
     }
 }
