@@ -2,7 +2,10 @@ package com.example.labs;
 
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +23,8 @@ public class ListItemFragment extends Fragment {
     private static final String ARG_INDEX = "index";
 
     private int mIndex;
+    MyViewModel mViewModel;
+    View mInflatedView;
 
     public int getShownIndex(){
         return mIndex;
@@ -50,6 +55,8 @@ public class ListItemFragment extends Fragment {
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_INDEX);
         }
+        mViewModel = new ViewModelProvider(getActivity()).get(MyViewModel.class);
+        mViewModel.selectItem(mIndex);
     }
 
     @Override
@@ -57,9 +64,16 @@ public class ListItemFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         Log.i(this.getClass().getSimpleName()+" Observer","onCreateView");
-        View inflatedViewer = inflater.inflate(R.layout.fragment_list_item,container,false);
-        TextView text =(TextView) inflatedViewer.findViewById(R.id.listItemTextView);
-        text.setText(DummyData.DATA_CONTENT[mIndex]);
-        return inflatedViewer;
+        mInflatedView = inflater.inflate(R.layout.fragment_list_item,container,false);
+//        Create the observer which updates the UI.
+        final Observer<item> itemObserver = new Observer<item>() {
+            @Override
+            public void onChanged(@Nullable final item item){
+                TextView text =(TextView) mInflatedView.findViewById(R.id.listItemTextView);
+                text.setText(DummyData.DATA_CONTENT[mIndex]);
+            }
+        };
+        mViewModel.getSelectedItem().observe(getViewLifecycleOwner(),itemObserver);
+        return mInflatedView;
     }
 }

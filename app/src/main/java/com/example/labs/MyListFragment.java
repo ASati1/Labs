@@ -1,5 +1,6 @@
 package com.example.labs;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,10 +9,32 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import androidx.fragment.app.ListFragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+
+import java.util.List;
 
 public class MyListFragment extends ListFragment {
     int mCurCheckPosition = 0;
     boolean msSingleActivity;
+    MyViewModel mViewModel;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mViewModel = new ViewModelProvider(getActivity()).get(MyViewModel.class);
+    }
+//    Created the observer which updates the UI
+    final Observer<List<item>> itemObserver = new Observer<List<item>>(){
+        @Override
+        public void onChanged(@Nullable final List<item> items){
+            ItemAdapter itemAdapter = new ItemAdapter(getActivity(),mViewModel.getItems().getValue());
+            setListAdapter(itemAdapter);
+        }
+    };
+
+//    Observer the LiveData, passing in this activity as the LifecycleOwner and the observer
+    mViewModel.getItems().observe(this, itemObserver);
 
     @Override
     public void onActivityCreated(Bundle saveInstanceState) {
@@ -40,6 +63,7 @@ public class MyListFragment extends ListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
+        mViewModel.selectItem(position);
         showContext(position);
     }
 
