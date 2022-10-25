@@ -23,18 +23,19 @@ public class MyListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mViewModel = new ViewModelProvider(getActivity()).get(MyViewModel.class);
-    }
-//    Created the observer which updates the UI
-    final Observer<List<item>> itemObserver = new Observer<List<item>>(){
-        @Override
-        public void onChanged(@Nullable final List<item> items){
-            ItemAdapter itemAdapter = new ItemAdapter(getActivity(),mViewModel.getItems().getValue());
-            setListAdapter(itemAdapter);
-        }
-    };
+
+        //    Created the observer which updates the UI
+        final Observer<List<item>> itemObserver = new Observer<List<item>>(){
+            @Override
+            public void onChanged(@Nullable final List<item> items){
+                ItemAdapter itemAdapter = new ItemAdapter(getActivity(),mViewModel.getItems().getValue());
+                setListAdapter(itemAdapter);
+            }
+        };
 
 //    Observer the LiveData, passing in this activity as the LifecycleOwner and the observer
-    mViewModel.getItems().observe(this, itemObserver);
+        mViewModel.getItems().observe(this, itemObserver);
+    }
 
     @Override
     public void onActivityCreated(Bundle saveInstanceState) {
