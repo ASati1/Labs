@@ -15,6 +15,7 @@ public class MyViewModel extends AndroidViewModel {
     private int mSelectedIndex;
     public MyViewModel(@NonNull Application application) {
         super(application);
+        getItems();
     }
 
     private void generateItems(){
@@ -40,5 +41,13 @@ public class MyViewModel extends AndroidViewModel {
         item selectedItem = mItems.getValue().get(mSelectedIndex);
         mSelectedItem = new MutableLiveData<item>();
         mSelectedItem.setValue(selectedItem);
+    }
+
+    public LiveData<item> getSelectedItem(){
+        if(mSelectedItem == null){
+            mSelectedItem = new MutableLiveData<item>();
+            selectItem(mSelectedIndex);
+        }
+        return mSelectedItem;
     }
 }
