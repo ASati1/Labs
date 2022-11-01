@@ -4,8 +4,14 @@ import android.content.Context;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,21 +30,21 @@ public class ItemsRepository {
     private ItemsRepository(Context pApplicationContext){
         this.mApplicationContext = pApplicationContext;
     }
-    
+
     public static ItemsRepository getInstance(Context pApplicationContext){
         if(sItemsRepository ==null){
             sItemsRepository = new ItemsRepository(pApplicationContext);
         }
         return sItemsRepository;
     }
-    
-    public LiveData<ArrayList<item>> loadItemsFromJSON(){
+
+    public void loadItemsFromJSON(){
         RequestQueue queue = Volley.newRequestQueue(mApplicationContext);
         String url = "https://www.goparker.com/600096/index.json";
         final MutableLiveData<ArrayList<item>> mutableItems = new MutableLiveData();
         //Request a jsonObject response from the provided URL.
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.Get,
+                Request.Method.GET,
                 url,
                 null,
                 new Response.Listener<JSONObject>() {
@@ -53,10 +59,9 @@ public class ItemsRepository {
                     public void onErrorResponse(VolleyError error){
                         String errorResponse = "That didn't work!";
                     }
-                }
-    });
-    }
+                });
 
+        }
     private ArrayList<item> parseJSONResponse(JSONObject pResponse) {
         ArrayList<item> items = new ArrayList();
         try {
@@ -85,6 +90,7 @@ public class ItemsRepository {
     }
 
     private void onResponse(JSONObject response) {
+
         ArrayList<item> items = parseJSONResponse(response);
         mutableItems.setValue(items);
         mItems = mutableItems;
@@ -100,5 +106,18 @@ public class ItemsRepository {
             mItems = loadItemsFromJSON();
         }
         return mItems;
+    }
+
+    public LiveData<item> getItem(int pItemIndex) {
+        LiveData<item> transformedItem= Transformations.switchMap(mItems, items ->{
+            MutableLiveData<item> itemData = new  MutableLiveData();
+            item item = items.get(pItemIndex);
+            itemData.setValue(item);
+
+            return itemData;
+        });
+
+        mSelectedItem = transformedItem;
+        return mSelectedItem;
     }
 }
