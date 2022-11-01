@@ -1,10 +1,14 @@
 package com.example.labs;
 
-import android.content.ClipData;
 import android.content.Context;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -13,6 +17,9 @@ public class ItemsRepository {
     public static ItemsRepository sItemsRepository;
 
     private Context mApplicationContext;
+
+    private LiveData<ArrayList<item>> mItems;
+    private LiveData<item> mSelectedItem;
 
     private ItemsRepository(Context pApplicationContext){
         this.mApplicationContext = pApplicationContext;
@@ -25,28 +32,73 @@ public class ItemsRepository {
         return sItemsRepository;
     }
     
-    public LiveData<ArrayList<ClipData.Item>> loadItemsFromJSON(){
+    public LiveData<ArrayList<item>> loadItemsFromJSON(){
         RequestQueue queue = Volley.newRequestQueue(mApplicationContext);
         String url = "https://www.goparker.com/600096/index.json";
-        
+        final MutableLiveData<ArrayList<item>> mutableItems = new MutableLiveData();
         //Request a jsonObject response from the provided URL.
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.Get,
                 url,
                 null,
-                new Response.Listener<JSONObject>(){
+                new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(JSONObject response){
-                        
-                        
+                    public void onResponse(JSONObject response) {
+
+
                     }
-        },
+                 },
                 new Response.ErrorListener(){
                     @Override
                     public void onErrorResponse(VolleyError error){
                         String errorResponse = "That didn't work!";
                     }
                 }
-        );
+    });
+    }
+
+    private ArrayList<item> parseJSONResponse(JSONObject pResponse) {
+        ArrayList<item> items = new ArrayList();
+        try {
+            JSONArray itemsArray = pResponse.getJSONArray("items");
+            for (int i =0;i<itemsArray.length(); i++){
+                JSONObject itemObject = itemsArray.getJSONObject(i);
+                item item = parseJSONItem(itemObject);
+                items.add(item);
+            }
+        }
+        catch(JSONException e) {
+            e.printStackTrace();
+        }
+        return items;
+    }
+
+    private item parseJSONItem(JSONObject pItemObject) throws org.json.JSONException {
+        String title = pItemObject.getString("title");
+        String link= pItemObject.getString("link");;
+        String date= pItemObject.getString("pubDate");;
+        String description= pItemObject.getString("description");;
+
+        item item = new item(title,link,date,description);
+
+        return item;
+    }
+
+    private void onResponse(JSONObject response) {
+        ArrayList<item> items = parseJSONResponse(response);
+        mutableItems.setValue(items);
+        mItems = mutableItems;
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonObjectRequest);
+
+        return mutableItems;
+    }
+
+    public LiveData<ArrayList<item>> getItems() {
+        if(mItems==null) {
+            mItems = loadItemsFromJSON();
+        }
+        return mItems;
     }
 }
