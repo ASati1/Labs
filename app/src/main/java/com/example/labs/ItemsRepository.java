@@ -50,8 +50,14 @@ public class ItemsRepository {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        ArrayList<item> items = parseJSONResponse(response);
+                        mutableItems.setValue(items);
+                        mItems = mutableItems;
 
+                        // Add the request to the RequestQueue.
+                        queue.add(jsonObjectRequest);
 
+                        return mutableItems;
                     }
                  },
                 new Response.ErrorListener(){
@@ -87,25 +93,6 @@ public class ItemsRepository {
         item item = new item(title,link,date,description);
 
         return item;
-    }
-
-    private void onResponse(JSONObject response) {
-
-        ArrayList<item> items = parseJSONResponse(response);
-        mutableItems.setValue(items);
-        mItems = mutableItems;
-
-        // Add the request to the RequestQueue.
-        queue.add(jsonObjectRequest);
-
-        return mutableItems;
-    }
-
-    public LiveData<ArrayList<item>> getItems() {
-        if(mItems==null) {
-            mItems = loadItemsFromJSON();
-        }
-        return mItems;
     }
 
     public LiveData<item> getItem(int pItemIndex) {
