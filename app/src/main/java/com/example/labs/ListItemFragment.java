@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -52,6 +53,7 @@ public class ListItemFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_INDEX);
         }
@@ -69,10 +71,13 @@ public class ListItemFragment extends Fragment {
         final Observer<item> itemObserver = new Observer<item>() {
             @Override
             public void onChanged(@Nullable final item item){
+                ImageView image =(ImageView) mInflatedView.findViewById(R.id.imageView_image);
+                image.setImageBitmap(item.getImage());
                 TextView text =(TextView) mInflatedView.findViewById(R.id.listItemTextView);
-                text.setText(DummyData.DATA_CONTENT[mIndex]);
+                text.setText(item.getDescription());
             }
         };
+
         mViewModel.getSelectedItem().observe(getViewLifecycleOwner(),itemObserver);
         return mInflatedView;
     }

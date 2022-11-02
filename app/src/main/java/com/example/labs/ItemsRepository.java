@@ -110,7 +110,7 @@ public class ItemsRepository {
             MutableLiveData<item> itemData = new  MutableLiveData();
             item item = items.get(pItemIndex);
             itemData.setValue(item);
-
+            loadImage(item.getImageUrl(),itemData);
             return itemData;
         });
 

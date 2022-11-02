@@ -68,7 +68,7 @@ public class MyListFragment extends ListFragment {
         showContext(position);
     }
 
-    private void showContext(int index) {
+    void showContext(int index) {
         mCurCheckPosition = index;
 
         if (msSingleActivity) {
