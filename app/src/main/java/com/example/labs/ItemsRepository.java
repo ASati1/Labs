@@ -38,10 +38,10 @@ public class ItemsRepository {
         return sItemsRepository;
     }
 
-    public void loadItemsFromJSON(){
+    public LiveData<ArrayList<item>> loadItemsFromJSON(){
         RequestQueue queue = Volley.newRequestQueue(mApplicationContext);
         String url = "https://www.goparker.com/600096/index.json";
-        final MutableLiveData<ArrayList<item>> mutableItems = new MutableLiveData();
+        final MutableLiveData<ArrayList<item>> mutableItems = new MutableLiveData<>();
         //Request a jsonObject response from the provided URL.
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.GET,
@@ -53,11 +53,6 @@ public class ItemsRepository {
                         ArrayList<item> items = parseJSONResponse(response);
                         mutableItems.setValue(items);
                         mItems = mutableItems;
-
-                        // Add the request to the RequestQueue.
-                        queue.add(jsonObjectRequest);
-
-                        return mutableItems;
                     }
                  },
                 new Response.ErrorListener(){
@@ -66,6 +61,9 @@ public class ItemsRepository {
                         String errorResponse = "That didn't work!";
                     }
                 });
+        // Add the request to the RequestQueue.
+        queue.add(jsonObjectRequest);
+        return mutableItems;
 
         }
     private ArrayList<item> parseJSONResponse(JSONObject pResponse) {
@@ -95,7 +93,14 @@ public class ItemsRepository {
         return item;
     }
 
+    public LiveData<ArrayList<item>> getItems(){
+        if(mItems==null){
+            mItems = loadItemsFromJSON();
+        }
+        return mItems;
+    }
     public LiveData<item> getItem(int pItemIndex) {
+
         LiveData<item> transformedItem= Transformations.switchMap(mItems, items ->{
             MutableLiveData<item> itemData = new  MutableLiveData();
             item item = items.get(pItemIndex);
