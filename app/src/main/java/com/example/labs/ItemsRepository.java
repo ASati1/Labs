@@ -1,6 +1,8 @@
 package com.example.labs;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.widget.ImageView;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -10,6 +12,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -87,9 +90,10 @@ public class ItemsRepository {
         String link= pItemObject.getString("link");;
         String date= pItemObject.getString("pubDate");;
         String description= pItemObject.getString("description");;
+        String image= pItemObject.getString("image");;
 
         item item = new item(title,link,date,description);
-
+        item.setImageUrl(image);
         return item;
     }
 
@@ -99,6 +103,7 @@ public class ItemsRepository {
         }
         return mItems;
     }
+
     public LiveData<item> getItem(int pItemIndex) {
 
         LiveData<item> transformedItem= Transformations.switchMap(mItems, items ->{
@@ -112,4 +117,29 @@ public class ItemsRepository {
         mSelectedItem = transformedItem;
         return mSelectedItem;
     }
-}
+
+    public void loadImage(String pUrl, MutableLiveData<item> pItemData){
+        RequestQueue queue = Volley.newRequestQueue(mApplicationContext);
+        final MutableLiveData<item> mutableItem = pItemData;
+
+        ImageRequest imageRequest = new ImageRequest(
+                pUrl, new Response.Listener<Bitmap>() {
+            @Override
+            public void onResponse(Bitmap bitmap) {
+                //do something with the image;
+                item item = mutableItem.getValue();
+                item.setImage(bitmap);
+                mutableItem.setValue(item);
+            }
+        },
+                0,  0,
+                ImageView.ScaleType.CENTER_CROP,
+                Bitmap.Config.RGB_565,
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        String errorResponse = "That didn't work!";
+                    }
+                });
+        }
+    }

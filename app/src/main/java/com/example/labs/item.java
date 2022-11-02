@@ -1,6 +1,10 @@
 package com.example.labs;
 
+import android.graphics.Bitmap;
+
 public class item {
+    private Bitmap mImage;
+    private String mImageUrl;
     private String mTitle;
     private String mLink;
     private String mDate;
@@ -12,7 +16,10 @@ public class item {
         setDate(pDate);
         setDescription(pDescription);
     }
-
+    public Bitmap getImage(){return mImage; }
+    public void setImage(Bitmap pImage){mImage = pImage; }
+    public String getImageUrl(){return mImageUrl; }
+    public void setImageUrl(String pImageUrl){mImageUrl = pImageUrl; }
     public String getTitle(){return mTitle; }
     public void setTitle(String pTitle){mTitle = pTitle; }
     public String getLink(){return mLink; }
