@@ -1,7 +1,10 @@
 package com.example.labs;
 
+import android.content.ClipData;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.lifecycle.LiveData;
@@ -20,6 +23,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class ItemsRepository {
@@ -141,5 +150,55 @@ public class ItemsRepository {
                         String errorResponse = "That didn't work!";
                     }
                 });
+        }
+        // saving data from the application on a local drive
+        public void saveIndexLocally(JSONObject pIndexObject, String pFileName) {
+            ContextWrapper contextWrapper = new ContextWrapper(mApplicationContext);
+            OutputStreamWriter outputStreamWriter = null;
+            try{
+                outputStreamWriter = new OutputStreamWriter(
+                        contextWrapper.openFileOutput(pFileName,Context.MODE_PRIVATE));
+                outputStreamWriter.write(pIndexObject.toString());
+                outputStreamWriter.flush();
+                outputStreamWriter.close();
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
+        }
+        // Loading stored data to the application
+        private LiveData<ArrayList<item>> loadIndexLocally(String pFileName){
+            JSONObject indexObject = null;
+            MutableLiveData<ArrayList<item>> mutableItems = new MutableLiveData<ArrayList<item>>();
+            try{
+                InputStream inputStream = mApplicationContext.openFileInput(pFileName);
+
+                if(inputStream !=null){
+                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                    String receiveString ="";
+                    StringBuilder stringBuilder = new StringBuilder();
+
+                    while ((receiveString = bufferedReader.readLine()) !=null){
+                        stringBuilder.append(receiveString);
+                    }
+
+                    inputStream.close();
+                    String builtString = stringBuilder.toString();
+                    indexObject = new JSONObject(builtString);
+                }
+            }
+            catch (FileNotFoundException e){
+                Log.e("JSONLoading","File not found"+e.toString());
+            }catch (IOException e){
+                Log.e("JSONLoading","Can not read file"+e.toString());
+            }catch (JSONException e){
+                Log.e("JSONLoading","json error"+e.toString());
+            }
+            if(indexObject !=null){
+                ArrayList<item> items = parseJSONResponse(indexObject);
+                mutableItems.setValue(items);
+            }
+
+            return mutableItems;
         }
     }
