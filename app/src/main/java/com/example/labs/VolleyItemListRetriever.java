@@ -12,9 +12,12 @@ import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class VolleyItemListRetriever implements VolleyJSONObjectResponse,VolleyItemImageResponse{
     private String mUrl;
@@ -52,8 +55,31 @@ public class VolleyItemListRetriever implements VolleyJSONObjectResponse,VolleyI
     @Override
     public void onError(VolleyError pError, String pTag){Log.e("VolleyItemListRetriever",pTag);}
 
-    private ArrayList<item> parseJSONResponse(JSONObject pObject) {
+    private ArrayList<item> parseJSONResponse(JSONObject pResponse) {
         ArrayList<item> items = new ArrayList<>();
+        try{
+            JSONArray itemsArray=pResponse.getJSONArray("items");
+            for(int i=0;i<itemsArray.length();i++){
+                JSONObject itemObject = itemsArray.getJSONObject(i);
+                item item = parseJSONItem(itemObject);
+                items.add(item);
+            }
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+        Collections.sort(items, Collections.reverseOrder());
         return items;
+    }
+
+    private item parseJSONItem(JSONObject pItemObject) throws org.json.JSONException{
+        String title = pItemObject.getString("title");
+        String link = pItemObject.getString("link");
+        String date = pItemObject.getString("pubDate");
+        String description = pItemObject.getString("description");
+        String imageUrl = pItemObject.getString("image");
+        item item = new item();
+        mQueue.add();
+        return item;
     }
 }
