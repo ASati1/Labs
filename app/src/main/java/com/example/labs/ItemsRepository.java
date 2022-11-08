@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
@@ -40,11 +42,13 @@ public class ItemsRepository {
 
     private Context mApplicationContext;
 
-    private LiveData<ArrayList<item>> mItems;
+//    private LiveData<ArrayList<item>> mItems;
+    private MediatorLiveData<ArrayList<item>> mItems;
     private LiveData<item> mSelectedItem;
 
     private ItemsRepository(Context pApplicationContext){
-        this.mApplicationContext = pApplicationContext;
+        mApplicationContext = pApplicationContext;
+        mItems = new MediatorLiveData<>();
     }
 
     public static ItemsRepository getInstance(Context pApplicationContext){
@@ -66,9 +70,9 @@ public class ItemsRepository {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        saveIndexLocally(response,"index.json");
                         ArrayList<item> items = parseJSONResponse(response);
                         mutableItems.setValue(items);
-                        mItems = mutableItems;
                     }
                  },
                 new Response.ErrorListener(){
@@ -111,9 +115,11 @@ public class ItemsRepository {
     }
 
     public LiveData<ArrayList<item>> getItems(){
-        if(mItems==null){
-            mItems = loadItemsFromJSON();
-        }
+        LiveData<ArrayList<item>> removeData = loadItemsFromJSON();
+        LiveData<ArrayList<item>> localData = loadIndexLocally("index.json");
+        mItems.addSource(removeData,value-> mItems.setValue(value));
+        mItems.addSource(localData,value-> mItems.setValue(value));
+
         return mItems;
     }
 
@@ -123,7 +129,10 @@ public class ItemsRepository {
             MutableLiveData<item> itemData = new  MutableLiveData();
             item item = items.get(pItemIndex);
             itemData.setValue(item);
-            loadImage(item.getImageUrl(),itemData);
+            if(!loadImageLocally(Uri.parse(item.getImageUrl()).getLastPathSegment(),itemData)){
+                loadImage(item.getImageUrl(),itemData);
+            }
+
             return itemData;
         });
 
@@ -142,6 +151,7 @@ public class ItemsRepository {
                 //do something with the image;
                 item item = mutableItem.getValue();
                 item.setImage(bitmap);
+                saveImageLocally(bitmap, Uri.parse(pUrl).getLastPathSegment());
                 mutableItem.setValue(item);
             }
         },
