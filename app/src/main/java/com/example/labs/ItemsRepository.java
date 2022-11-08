@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -24,7 +25,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -200,5 +204,45 @@ public class ItemsRepository {
             }
 
             return mutableItems;
+        }
+
+        public void saveImageLocally(Bitmap pBitmap, String pFileName){
+            ContextWrapper contextWrapper = new ContextWrapper(mApplicationContext);
+            File directory = contextWrapper.getDir("itemsImages",Context.MODE_PRIVATE);
+            File file = new File(directory,pFileName);
+            if(!file.exists()){
+                FileOutputStream fileOutputStream = null;
+                try {
+                    fileOutputStream = new FileOutputStream(file);
+                    pBitmap.compress(Bitmap.CompressFormat.PNG,100,fileOutputStream);
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
+                }catch (java.io.IOException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public boolean loadImageLocally(String pFileName, MutableLiveData<item> pItemData){
+            boolean loaded = false;
+            ContextWrapper contextWrapper = new ContextWrapper(mApplicationContext);
+            File directory = contextWrapper.getDir("itemImages",Context.MODE_PRIVATE);
+            File file = new File(directory, pFileName);
+            if(file.exists()){
+                FileInputStream fileInputStream = null;
+                try{
+                    fileInputStream = new FileInputStream(file);
+                    Bitmap bitmap = BitmapFactory.decodeStream(fileInputStream);
+                    item item = pItemData.getValue();
+                    item.setImage(bitmap);
+                    pItemData.setValue(item);
+
+                    fileInputStream.close();
+                    loaded=true;
+                }catch (java.io.IOException e){
+                    e.printStackTrace();
+                }
+            }
+            return loaded;
         }
     }
