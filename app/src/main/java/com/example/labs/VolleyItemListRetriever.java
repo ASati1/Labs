@@ -78,8 +78,14 @@ public class VolleyItemListRetriever implements VolleyJSONObjectResponse,VolleyI
         String date = pItemObject.getString("pubDate");
         String description = pItemObject.getString("description");
         String imageUrl = pItemObject.getString("image");
-        item item = new item();
-        mQueue.add();
+
+        item item = new item(title,link,date,description);
+        item.setImageUrl(imageUrl);
+
+        CustomItemImageRequest itemImageRequest = new CustomItemImageRequest(
+                item.getImageUrl(),
+                item,this);
+        mQueue.add(itemImageRequest.getItemImageRequest());
         return item;
     }
 }
